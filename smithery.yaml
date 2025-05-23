@@ -1,0 +1,23 @@
+# Smithery configuration file: https://smithery.ai/docs/build/project-config
+
+startCommand:
+  type: stdio
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({ command: 'node', args: ['dist/index.js', `--api-key=${config.caiyunApiKey}`], env: config.amapApiKey ? { AMAP_API_KEY: config.amapApiKey } : {} })
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - caiyunApiKey
+    properties:
+      caiyunApiKey:
+        type: string
+        description: 彩云天气 API 密钥
+      amapApiKey:
+        type: string
+        description: 高德地图 API 密钥，可选
+  exampleConfig:
+    caiyunApiKey: YOUR_CAIYUN_API_KEY
+    amapApiKey: YOUR_AMAP_API_KEY
