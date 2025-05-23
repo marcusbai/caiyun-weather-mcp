@@ -15,6 +15,15 @@
 
 ## 安装
 
+### 安装 Smithery
+
+通过 [Smithery](https://smithery.ai/server/@pepperai/caiyun-weather-mcp) 安装 彩云天气 对于Claude的桌面应用：
+
+```bash
+npm install @smithery/cli -g
+smithery install @pepperai/caiyun-weather-mcp
+```
+
 1. 克隆仓库：
 
 ```bash
