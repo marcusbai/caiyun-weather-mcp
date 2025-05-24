@@ -1,4 +1,5 @@
 # 彩云天气 MCP 服务器
+[![smithery badge](https://smithery.ai/badge/@marcusbai/caiyun-weather-mcp)](https://smithery.ai/server/@marcusbai/caiyun-weather-mcp)
 
 基于彩云天气 API 的 Model Context Protocol (MCP) 服务器，提供天气数据查询功能。
 
