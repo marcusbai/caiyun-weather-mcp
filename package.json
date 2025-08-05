@@ -4,6 +4,9 @@
   "description": "Caiyun Weather MCP Server",
   "main": "dist/index.js",
   "type": "module",
+  "bin": {
+    "caiyun-weather-mcp": "dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",

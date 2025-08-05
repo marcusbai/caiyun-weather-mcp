@@ -25,6 +25,22 @@ npm install @smithery/cli -g
 smithery install @pepperai/caiyun-weather-mcp
 ```
 
+### 通过 NPX 使用
+
+您可以直接通过 NPX 运行：
+
+```bash
+npx caiyun-weather-mcp --api-key=您的彩云天气API密钥
+```
+
+或者设置环境变量：
+
+```bash
+CAIYUN_API_KEY=您的密钥 npx caiyun-weather-mcp
+```
+
+### 从源码安装
+
 1. 克隆仓库：
 
 ```bash
@@ -72,6 +88,25 @@ npm run build
     "caiyun-weather": {
       "command": "node",
       "args": ["完整路径/caiyun-weather-mcp/dist/index.js"],
+      "env": {
+        "CAIYUN_API_KEY": "您的彩云天气API密钥",
+        "AMAP_API_KEY": "您的高德地图API密钥（可选）"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
+```
+
+如果您通过 NPX 安装了本服务，可以使用以下配置：
+
+```json
+{
+  "mcpServers": {
+    "caiyun-weather": {
+      "command": "npx",
+      "args": ["caiyun-weather-mcp"],
       "env": {
         "CAIYUN_API_KEY": "您的彩云天气API密钥",
         "AMAP_API_KEY": "您的高德地图API密钥（可选）"
