@@ -2,7 +2,17 @@
   "mcpServers": {
     "caiyun-weather": {
       "command": "node",
-      "args": ["C:/Users/Bai Yang/Desktop/small-tools/caiyun-weather-mcp/dist/index.js"],
+      "args": ["/path/to/caiyun-weather-mcp/dist/index.js"],
+      "env": {
+        "CAIYUN_API_KEY": "您的彩云天气API密钥",
+        "AMAP_API_KEY": "您的高德地图API密钥（可选）"
+      },
+      "disabled": false,
+      "autoApprove": []
+    },
+    "caiyun-weather-npx": {
+      "command": "npx",
+      "args": ["caiyun-weather-mcp"],
       "env": {
         "CAIYUN_API_KEY": "您的彩云天气API密钥",
         "AMAP_API_KEY": "您的高德地图API密钥（可选）"
