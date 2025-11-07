@@ -5,7 +5,7 @@
       "args": ["/path/to/caiyun-weather-mcp/dist/index.js"],
       "env": {
         "CAIYUN_API_KEY": "您的彩云天气API密钥",
-        "AMAP_API_KEY": "您的高德地图API密钥（可选）"
+        "AMAP_API_KEY": "您的高德地图API密钥"
       },
       "disabled": false,
       "autoApprove": []
@@ -15,7 +15,7 @@
       "args": ["caiyun-weather-mcp"],
       "env": {
         "CAIYUN_API_KEY": "您的彩云天气API密钥",
-        "AMAP_API_KEY": "您的高德地图API密钥（可选）"
+        "AMAP_API_KEY": "您的高德地图API密钥"
       },
       "disabled": false,
       "autoApprove": []
