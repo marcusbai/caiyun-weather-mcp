@@ -317,6 +317,66 @@ class CaiyunWeatherMcpServer {
             required: ['longitude', 'latitude'],
           },
         },
+        {
+          name: 'get_air_quality_trend',
+          description: '获取空气质量趋势信息',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              longitude: {
+                type: 'number',
+                description: '经度',
+              },
+              latitude: {
+                type: 'number',
+                description: '纬度',
+              },
+              language: {
+                type: 'string',
+                enum: ['zh_CN', 'en_US'],
+                description: '语言',
+                default: 'zh_CN',
+              },
+              unit: {
+                type: 'string',
+                enum: ['metric', 'imperial'],
+                description: '单位制 (metric: 公制, imperial: 英制)',
+                default: 'metric',
+              },
+            },
+            required: ['longitude', 'latitude'],
+          },
+        },
+        {
+          name: 'get_detailed_life_index',
+          description: '获取详细生活指数信息',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              longitude: {
+                type: 'number',
+                description: '经度',
+              },
+              latitude: {
+                type: 'number',
+                description: '纬度',
+              },
+              language: {
+                type: 'string',
+                enum: ['zh_CN', 'en_US'],
+                description: '语言',
+                default: 'zh_CN',
+              },
+              unit: {
+                type: 'string',
+                enum: ['metric', 'imperial'],
+                description: '单位制 (metric: 公制, imperial: 英制)',
+                default: 'metric',
+              },
+            },
+            required: ['longitude', 'latitude'],
+          },
+        },
       ],
     }));
 
@@ -492,6 +552,50 @@ class CaiyunWeatherMcpServer {
                 {
                   type: 'text',
                   text: JSON.stringify(weatherService.formatAlertData(weatherData), null, 2),
+                },
+              ],
+            };
+          }
+          
+          case 'get_air_quality_trend': {
+            if (!this.isValidLocationArgs(args)) {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                '无效的位置参数'
+              );
+            }
+            
+            const { longitude, latitude } = args;
+            
+            const weatherData = await weatherService.getAirQualityTrend(longitude, latitude);
+            
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(weatherService.formatAirQualityTrendData(weatherData), null, 2),
+                },
+              ],
+            };
+          }
+          
+          case 'get_detailed_life_index': {
+            if (!this.isValidLocationArgs(args)) {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                '无效的位置参数'
+              );
+            }
+            
+            const { longitude, latitude } = args;
+            
+            const weatherData = await weatherService.getDetailedLifeIndex(longitude, latitude);
+            
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(weatherService.formatDetailedLifeIndexData(weatherData), null, 2),
                 },
               ],
             };

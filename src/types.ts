@@ -20,6 +20,79 @@ export interface CaiyunWeatherResponse {
   };
 }
 
+// 降水类型枚举
+export enum PrecipitationType {
+  RAIN = 'rain',
+  SNOW = 'snow', 
+  SLEET = 'sleet',
+  HAIL = 'hail',
+  NONE = 'none'
+}
+
+// 降水类型中文映射
+export const precipitationTypeMap: Record<string, string> = {
+  [PrecipitationType.RAIN]: '雨',
+  [PrecipitationType.SNOW]: '雪',
+  [PrecipitationType.SLEET]: '雨夹雪',
+  [PrecipitationType.HAIL]: '冰雹',
+  [PrecipitationType.NONE]: '无降水'
+};
+
+// 降水类型英文映射
+export const precipitationTypeMapEn: Record<string, string> = {
+  [PrecipitationType.RAIN]: 'Rain',
+  [PrecipitationType.SNOW]: 'Snow',
+  [PrecipitationType.SLEET]: 'Sleet',
+  [PrecipitationType.HAIL]: 'Hail',
+  [PrecipitationType.NONE]: 'No Precipitation'
+};
+
+// 空气质量趋势
+export interface AirQualityTrend {
+  direction: 'up' | 'down' | 'stable';
+  change: number;
+  description: string;
+}
+
+// 主要污染物
+export interface PrimaryPollutant {
+  type: string;
+  concentration: number;
+  description: string;
+}
+
+// 扩展的生活指数
+export interface ExtendedLifeIndex {
+  ultraviolet: {
+    index: number;
+    desc: string;
+  };
+  comfort: {
+    index: number;
+    desc: string;
+  };
+  sport?: {
+    index: string;
+    desc: string;
+  };
+  travel?: {
+    index: string;
+    desc: string;
+  };
+  cold?: {
+    index: string;
+    desc: string;
+  };
+  carWashing: {
+    index: string;
+    desc: string;
+  };
+  dressing: {
+    index: string;
+    desc: string;
+  };
+}
+
 // 实时天气数据
 export interface RealtimeData {
   status: string;
@@ -40,11 +113,13 @@ export interface RealtimeData {
       status: string;
       datasource: string;
       intensity: number;
+      type?: string; // 降水类型
     };
     nearest?: {
       status: string;
       distance: number;
       intensity: number;
+      type?: string; // 降水类型
     };
   };
   air_quality: {
@@ -62,17 +137,10 @@ export interface RealtimeData {
       chn: string;
       usa: string;
     };
+    trend?: AirQualityTrend; // 空气质量趋势
+    primary_pollutant?: PrimaryPollutant; // 主要污染物
   };
-  life_index: {
-    ultraviolet: {
-      index: number;
-      desc: string;
-    };
-    comfort: {
-      index: number;
-      desc: string;
-    };
-  };
+  life_index: ExtendedLifeIndex;
 }
 
 // 分钟级降水数据
@@ -93,6 +161,7 @@ export interface HourlyData {
     datetime: string;
     value: number;
     probability?: number;
+    type?: string; // 降水类型
   }>;
   temperature: Array<{
     datetime: string;
@@ -138,10 +207,15 @@ export interface HourlyData {
         chn: number;
         usa: number;
       };
+      trend?: AirQualityTrend;
     }>;
     pm25: Array<{
       datetime: string;
       value: number;
+    }>;
+    primary_pollutant?: Array<{
+      datetime: string;
+      value: PrimaryPollutant;
     }>;
   };
 }
@@ -164,6 +238,7 @@ export interface DailyData {
     min: number;
     avg: number;
     probability: number;
+    type?: string; // 降水类型
   }>;
   temperature: Array<{
     date: string;
@@ -273,12 +348,17 @@ export interface DailyData {
         chn: number;
         usa: number;
       };
+      trend?: AirQualityTrend;
     }>;
     pm25: Array<{
       date: string;
       max: number;
       avg: number;
       min: number;
+    }>;
+    primary_pollutant?: Array<{
+      date: string;
+      value: PrimaryPollutant;
     }>;
   };
   skycon: Array<{
@@ -315,6 +395,16 @@ export interface DailyData {
       desc: string;
     }>;
     coldRisk: Array<{
+      date: string;
+      index: string;
+      desc: string;
+    }>;
+    sport?: Array<{
+      date: string;
+      index: string;
+      desc: string;
+    }>;
+    travel?: Array<{
       date: string;
       index: string;
       desc: string;

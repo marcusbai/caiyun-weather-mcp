@@ -1,5 +1,13 @@
 import axios from 'axios';
-import { CaiyunWeatherResponse, skyconMap, skyconMapEn } from './types.js';
+import { 
+  CaiyunWeatherResponse, 
+  skyconMap, 
+  skyconMapEn,
+  precipitationTypeMap,
+  precipitationTypeMapEn,
+  AirQualityTrend,
+  PrimaryPollutant
+} from './types.js';
 
 export class CaiyunWeatherService {
   private apiKey: string;
@@ -194,6 +202,18 @@ export class CaiyunWeatherService {
   }
 
   /**
+   * 将降水类型转换为可读文本
+   * @param type 降水类型
+   * @returns 降水类型描述文本
+   */
+  getPrecipitationTypeText(type?: string): string {
+    if (!type) return this.language === 'zh_CN' ? '未知' : 'Unknown';
+    return this.language === 'zh_CN' 
+      ? precipitationTypeMap[type] || type
+      : precipitationTypeMapEn[type] || type;
+  }
+
+  /**
    * 格式化实时天气数据
    * @param data 彩云天气API响应
    * @returns 格式化后的实时天气数据
@@ -219,9 +239,19 @@ export class CaiyunWeatherService {
       pressure: realtime.pressure,
       visibility: realtime.visibility,
       precipitation: {
-        local: realtime.precipitation.local.intensity,
-        nearest: realtime.precipitation.nearest?.intensity || 0,
-        nearest_distance: realtime.precipitation.nearest?.distance || 0
+        local: {
+          intensity: realtime.precipitation.local.intensity,
+          type: this.getPrecipitationTypeText(realtime.precipitation.local.type)
+        },
+        nearest: realtime.precipitation.nearest ? {
+          intensity: realtime.precipitation.nearest.intensity,
+          type: this.getPrecipitationTypeText(realtime.precipitation.nearest.type),
+          distance: realtime.precipitation.nearest.distance
+        } : {
+          intensity: 0,
+          type: this.getPrecipitationTypeText('none'),
+          distance: 0
+        }
       },
       air_quality: {
         aqi: realtime.air_quality.aqi.chn,
@@ -231,11 +261,18 @@ export class CaiyunWeatherService {
         so2: realtime.air_quality.so2,
         no2: realtime.air_quality.no2,
         co: realtime.air_quality.co,
-        description: realtime.air_quality.description.chn
+        description: realtime.air_quality.description.chn,
+        trend: realtime.air_quality.trend,
+        primary_pollutant: realtime.air_quality.primary_pollutant
       },
       life_index: {
         comfort: realtime.life_index.comfort.desc,
-        ultraviolet: realtime.life_index.ultraviolet.desc
+        ultraviolet: realtime.life_index.ultraviolet.desc,
+        sport: realtime.life_index.sport?.desc,
+        travel: realtime.life_index.travel?.desc,
+        cold: realtime.life_index.cold?.desc,
+        carWashing: realtime.life_index.carWashing.desc,
+        dressing: realtime.life_index.dressing.desc
       }
     };
   }
@@ -292,11 +329,14 @@ export class CaiyunWeatherService {
         visibility: hourly.visibility[index].value,
         precipitation: {
           value: hourly.precipitation[index].value,
-          probability: hourly.precipitation[index].probability
+          probability: hourly.precipitation[index].probability,
+          type: this.getPrecipitationTypeText(hourly.precipitation[index].type)
         },
         air_quality: {
           aqi: hourly.air_quality.aqi[index].value.chn,
-          pm25: hourly.air_quality.pm25[index].value
+          pm25: hourly.air_quality.pm25[index].value,
+          trend: hourly.air_quality.aqi[index].trend,
+          primary_pollutant: hourly.air_quality.primary_pollutant?.[index]?.value
         }
       }))
     };
@@ -359,11 +399,14 @@ export class CaiyunWeatherService {
           max: daily.precipitation[index].max,
           min: daily.precipitation[index].min,
           avg: daily.precipitation[index].avg,
-          probability: daily.precipitation[index].probability
+          probability: daily.precipitation[index].probability,
+          type: this.getPrecipitationTypeText(daily.precipitation[index].type)
         },
         air_quality: {
           aqi: daily.air_quality.aqi[index].avg.chn,
-          pm25: daily.air_quality.pm25[index].avg
+          pm25: daily.air_quality.pm25[index].avg,
+          trend: daily.air_quality.aqi[index].trend,
+          primary_pollutant: daily.air_quality.primary_pollutant?.[index]?.value
         },
         astro: {
           sunrise: daily.astro[index].sunrise.time,
@@ -374,7 +417,9 @@ export class CaiyunWeatherService {
           ultraviolet: daily.life_index.ultraviolet[index].desc,
           carWashing: daily.life_index.carWashing[index].desc,
           dressing: daily.life_index.dressing[index].desc,
-          coldRisk: daily.life_index.coldRisk[index].desc
+          coldRisk: daily.life_index.coldRisk[index].desc,
+          sport: daily.life_index.sport?.[index]?.desc,
+          travel: daily.life_index.travel?.[index]?.desc
         }
       }))
     };
@@ -428,23 +473,19 @@ export class CaiyunWeatherService {
     };
 
     if (data.result.realtime) {
-      result.realtime = this.formatRealtimeData(data).temperature ? 
-        this.formatRealtimeData(data) : undefined;
+      result.realtime = this.formatRealtimeData(data);
     }
 
     if (data.result.minutely) {
-      result.minutely = this.formatMinutelyData(data).description ? 
-        this.formatMinutelyData(data) : undefined;
+      result.minutely = this.formatMinutelyData(data);
     }
 
     if (data.result.hourly) {
-      result.hourly = this.formatHourlyData(data).forecast?.length ? 
-        this.formatHourlyData(data) : undefined;
+      result.hourly = this.formatHourlyData(data);
     }
 
     if (data.result.daily) {
-      result.daily = this.formatDailyData(data).forecast?.length ? 
-        this.formatDailyData(data) : undefined;
+      result.daily = this.formatDailyData(data);
     }
 
     if (data.result.alert) {
@@ -452,5 +493,129 @@ export class CaiyunWeatherService {
     }
 
     return result;
+  }
+
+  /**
+   * 获取空气质量趋势
+   * @param longitude 经度
+   * @param latitude 纬度
+   * @returns 空气质量趋势数据
+   */
+  async getAirQualityTrend(longitude: number, latitude: number): Promise<CaiyunWeatherResponse> {
+    try {
+      const url = `${this.baseUrl}/${this.apiKey}/${longitude},${latitude}/hourly`;
+      const response = await axios.get<CaiyunWeatherResponse>(url, {
+        params: {
+          hourlysteps: 24,
+          lang: this.language,
+          unit: this.unit
+        }
+      });
+      
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(`彩云天气API错误: ${error.response?.data?.error || error.message}`);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * 格式化空气质量趋势数据
+   * @param data 彩云天气API响应
+   * @returns 格式化后的空气质量趋势数据
+   */
+  formatAirQualityTrendData(data: CaiyunWeatherResponse) {
+    const hourly = data.result.hourly;
+    if (!hourly) {
+      throw new Error('没有小时级天气数据');
+    }
+
+    return {
+      location: data.location,
+      server_time: new Date(data.server_time * 1000).toISOString(),
+      trend: hourly.air_quality.aqi.map((aqi, index) => ({
+        time: aqi.datetime,
+        aqi: aqi.value.chn,
+        trend: aqi.trend,
+        primary_pollutant: hourly.air_quality.primary_pollutant?.[index]?.value
+      }))
+    };
+  }
+
+  /**
+   * 获取详细生活指数
+   * @param longitude 经度
+   * @param latitude 纬度
+   * @returns 详细生活指数数据
+   */
+  async getDetailedLifeIndex(longitude: number, latitude: number): Promise<CaiyunWeatherResponse> {
+    try {
+      const url = `${this.baseUrl}/${this.apiKey}/${longitude},${latitude}/daily`;
+      const response = await axios.get<CaiyunWeatherResponse>(url, {
+        params: {
+          dailysteps: 1,
+          lang: this.language,
+          unit: this.unit
+        }
+      });
+      
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(`彩云天气API错误: ${error.response?.data?.error || error.message}`);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * 格式化详细生活指数数据
+   * @param data 彩云天气API响应
+   * @returns 格式化后的详细生活指数数据
+   */
+  formatDetailedLifeIndexData(data: CaiyunWeatherResponse) {
+    const daily = data.result.daily;
+    if (!daily) {
+      throw new Error('没有每日天气数据');
+    }
+
+    const today = daily.life_index;
+
+    return {
+      location: data.location,
+      server_time: new Date(data.server_time * 1000).toISOString(),
+      life_index: {
+        comfort: {
+          index: today.comfort[0]?.index,
+          desc: today.comfort[0]?.desc
+        },
+        ultraviolet: {
+          index: today.ultraviolet[0]?.index,
+          desc: today.ultraviolet[0]?.desc
+        },
+        carWashing: {
+          index: today.carWashing[0]?.index,
+          desc: today.carWashing[0]?.desc
+        },
+        dressing: {
+          index: today.dressing[0]?.index,
+          desc: today.dressing[0]?.desc
+        },
+        coldRisk: {
+          index: today.coldRisk[0]?.index,
+          desc: today.coldRisk[0]?.desc
+        },
+        sport: today.sport?.[0] ? {
+          index: today.sport[0]?.index,
+          desc: today.sport[0]?.desc
+        } : undefined,
+        travel: today.travel?.[0] ? {
+          index: today.travel[0]?.index,
+          desc: today.travel[0]?.desc
+        } : undefined
+      }
+    };
   }
 }

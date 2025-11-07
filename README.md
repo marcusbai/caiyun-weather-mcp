@@ -5,14 +5,18 @@
 
 ## 功能特点
 
-- **实时天气数据**：温度、湿度、风速、气压等
+- **实时天气数据**：温度、湿度、风速、气压、能见度等
 - **分钟级降水预报**：未来2小时的降水情况
 - **小时级天气预报**：未来24小时或更长时间的天气预报
 - **每日天气预报**：未来多天的天气预报
 - **天气预警信息**：各类天气预警
+- **空气质量趋势**：24小时空气质量变化趋势和主要污染物分析
+- **详细生活指数**：运动、旅行、洗车、穿衣等详细生活建议
+- **降水类型识别**：区分雨、雪、雨夹雪、冰雹等降水类型
 - **地址查询**：支持通过地址查询天气（需配置高德地图API）
 - **多语言支持**：支持中文和英文
 - **单位制选择**：支持公制和英制
+  +++++++ REPLACE
 
 ## 安装
 
@@ -243,6 +247,41 @@ npm run build
 </arguments>
 </use_mcp_tool>
 ```
+
+### 获取空气质量趋势
+
+```
+<use_mcp_tool>
+<server_name>caiyun-weather</server_name>
+<tool_name>get_air_quality_trend</tool_name>
+<arguments>
+{
+  "longitude": 116.3976,
+  "latitude": 39.9075,
+  "language": "zh_CN",
+  "unit": "metric"
+}
+</arguments>
+</use_mcp_tool>
+```
+
+### 获取详细生活指数
+
+```
+<use_mcp_tool>
+<server_name>caiyun-weather</server_name>
+<tool_name>get_detailed_life_index</tool_name>
+<arguments>
+{
+  "longitude": 116.3976,
+  "latitude": 39.9075,
+  "language": "zh_CN",
+  "unit": "metric"
+}
+</arguments>
+</use_mcp_tool>
+```
+  +++++++ REPLACE
 
 ## 参数说明
 
