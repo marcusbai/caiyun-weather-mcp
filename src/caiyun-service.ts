@@ -266,13 +266,13 @@ export class CaiyunWeatherService {
         primary_pollutant: realtime.air_quality.primary_pollutant
       },
       life_index: {
-        comfort: realtime.life_index.comfort.desc,
-        ultraviolet: realtime.life_index.ultraviolet.desc,
-        sport: realtime.life_index.sport?.desc,
-        travel: realtime.life_index.travel?.desc,
-        cold: realtime.life_index.cold?.desc,
-        carWashing: realtime.life_index.carWashing.desc,
-        dressing: realtime.life_index.dressing.desc
+        comfort: realtime.life_index.comfort?.desc || '暂无数据',
+        ultraviolet: realtime.life_index.ultraviolet?.desc || '暂无数据',
+        sport: realtime.life_index.sport?.desc || '暂无数据',
+        travel: realtime.life_index.travel?.desc || '暂无数据',
+        cold: realtime.life_index.cold?.desc || '暂无数据',
+        carWashing: realtime.life_index.carWashing?.desc || '暂无数据',
+        dressing: realtime.life_index.dressing?.desc || '暂无数据'
       }
     };
   }
@@ -413,11 +413,11 @@ export class CaiyunWeatherService {
           sunset: daily.astro[index].sunset.time
         },
         life_index: {
-          comfort: daily.life_index.comfort[index].desc,
-          ultraviolet: daily.life_index.ultraviolet[index].desc,
-          carWashing: daily.life_index.carWashing[index].desc,
-          dressing: daily.life_index.dressing[index].desc,
-          coldRisk: daily.life_index.coldRisk[index].desc,
+          comfort: daily.life_index.comfort?.[index]?.desc || '暂无数据',
+          ultraviolet: daily.life_index.ultraviolet?.[index]?.desc || '暂无数据',
+          carWashing: daily.life_index.carWashing?.[index]?.desc || '暂无数据',
+          dressing: daily.life_index.dressing?.[index]?.desc || '暂无数据',
+          coldRisk: daily.life_index.coldRisk?.[index]?.desc || '暂无数据',
           sport: daily.life_index.sport?.[index]?.desc,
           travel: daily.life_index.travel?.[index]?.desc
         }
@@ -588,32 +588,32 @@ export class CaiyunWeatherService {
       server_time: new Date(data.server_time * 1000).toISOString(),
       life_index: {
         comfort: {
-          index: today.comfort[0]?.index,
-          desc: today.comfort[0]?.desc
+          index: today.comfort?.[0]?.index,
+          desc: today.comfort?.[0]?.desc || '暂无数据'
         },
         ultraviolet: {
-          index: today.ultraviolet[0]?.index,
-          desc: today.ultraviolet[0]?.desc
+          index: today.ultraviolet?.[0]?.index,
+          desc: today.ultraviolet?.[0]?.desc || '暂无数据'
         },
         carWashing: {
-          index: today.carWashing[0]?.index,
-          desc: today.carWashing[0]?.desc
+          index: today.carWashing?.[0]?.index,
+          desc: today.carWashing?.[0]?.desc || '暂无数据'
         },
         dressing: {
-          index: today.dressing[0]?.index,
-          desc: today.dressing[0]?.desc
+          index: today.dressing?.[0]?.index,
+          desc: today.dressing?.[0]?.desc || '暂无数据'
         },
         coldRisk: {
-          index: today.coldRisk[0]?.index,
-          desc: today.coldRisk[0]?.desc
+          index: today.coldRisk?.[0]?.index,
+          desc: today.coldRisk?.[0]?.desc || '暂无数据'
         },
         sport: today.sport?.[0] ? {
           index: today.sport[0]?.index,
-          desc: today.sport[0]?.desc
+          desc: today.sport[0]?.desc || '暂无数据'
         } : undefined,
         travel: today.travel?.[0] ? {
           index: today.travel[0]?.index,
-          desc: today.travel[0]?.desc
+          desc: today.travel[0]?.desc || '暂无数据'
         } : undefined
       }
     };
